@@ -23,7 +23,7 @@ int main()
     {
         for(int i = 0; i < n; i++)
             cin >> a[i];
-        ll sum = 0, maxx = INF, st = 0;
+        ll sum = 0, minn = INF, st = 0;
         for(int i = 0; i < n; i++)
         {
             sum += a[i];
@@ -34,12 +34,12 @@ int main()
                     sum -= a[j];
                 }
                 st = j;
-                maxx = min(maxx, i - j + 1ll);
+                minn = min(minn, i - j + 1ll);
             }
         }
-        if(maxx == INF)
+        if(minn == INF)
             cout << 0 << endl;
         else
-            cout << maxx << endl;
+            cout << minn << endl;
     }
 }
