@@ -21,8 +21,6 @@ ll getSum(int& i, int& j, int& ii, int& jj)
     return board[ii][jj] - board[i - 1][jj] - board[ii][j - 1] + board[i - 1][j - 1];
 }
 
-// 3 10 3 2 2 5 3 8 3 9 7 3 6 3 8 20 1 1 1 1 1 10 2 5 1 5 10 1 5 10 5
-
 int main()
 {
     ios::sync_with_stdio(false);
