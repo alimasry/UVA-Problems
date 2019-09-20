@@ -13,42 +13,33 @@ const int MOD = 1e9 + 7;
 const double EPS = 1e-9;
 const double PI = acos(-1.0);
 
-const int N = 105;
+mt19937 rng((int) chrono::steady_clock::now().time_since_epoch().count());
 
-struct point {
-    double x, y;
-    bool operator< (const point& other) const {
-        return x > other.x;
-    }
-} p[N];
+typedef complex<double> point;
 
-double dist(point a, point b) {
-    double dx = a.x - b.x, dy = a.y - b.y;
-    return hypot(dx, dy);
+#define                     X real()
+#define                     Y imag()
+#define dist(a, b)          (abs((b) - (a)))
+#define dot(a,b)            ((conj(a) * (b)).real())
+#define cross(a,b)          ((conj(a) * (b)).imag())
+#define rotate(v,t)         (polar(v, t))
+#define rotateabout(v,t,a)  (rotate(vec(a, v), t) + (a))
+#define reflect(p,m)        ((conj((p) / (m))) * (m))
+#define normalize(p)        ((p) / length(p))
+#define same(a,b)           (abs(vec(a, b)) < EPS)
+#define mid(a,b)            (((a) + (b)) / point(2, 0))
+
+point intersect(const point &a, const point &b, const point &p, const point &q) { // handle parallel
+    double d1 = cross(p - a, b - a);
+    double d2 = cross(q - a, b - a);
+    return (d1 * q - d2 * p) / (d1 - d2);
 }
 
-struct line { double a, b, c; };
-
-// the answer is stored in the third parameter (pass by reference)
-void pointsToLine(point p1, point p2, line &l) {
-    if (p1.x - p2.x == 0) {
-        // vertical line is fine
-        l.a = 1.0;
-        l.b = 0.0;
-        l.c = -p1.x;
-        // default values
-    } else {
-        l.a = -(double)(p1.y - p2.y) / (p1.x - p2.x);
-        l.b = 1.0;
-        // IMPORTANT: we fix the value of b to 1.0
-        l.c = -(double)(l.a * p1.x) - p1.y;
-    } 
-}
-
-// ax + by + c = 0
-// x = -(by + c) / a
-point get(line l, double y) { // given y return the x
-    return (point) {-(l.b * y + l.c) / l.a, y};
+istream& operator>>(istream& in, point& p) {
+    double x, y; 
+    in >> x >> y;
+    p = {x, y};
+    return in;
 }
 
 ll t, n;
@@ -61,20 +52,25 @@ int main() {
 
     while (t--) {
         cin >> n;
+
+        vector<point> p(n);
         for (int i = 0; i < n; ++i)
-            cin >> p[i].x >> p[i].y;
+            cin >> p[i];
 
-        sort(p, p + n);
+        sort(p.begin(), p.end(), [](const point& p1, const point& p2) {
+                return p1.X > p2.X;
+                });
 
-        double ans = 0.0, maxy = p[0].y;
+        double maxy = 0.0, ans = 0.0;
         for (int i = 1; i < n; ++i) {
-            if (maxy <= p[i].y) {
-                line l;
-                pointsToLine(p[i], p[i - 1], l);
-                ans += dist(p[i], get(l, maxy));
-                maxy = max(maxy, p[i].y);
+            if (p[i].Y > maxy) {
+                point v = p[i] - p[i - 1];
+                point a = p[i - 1] + point((maxy - p[i - 1].Y) * v.X / v.Y, maxy - p[i - 1].Y);
+                maxy = p[i].Y;
+                ans += dist(a, p[i]);
             }
         }
+
         cout << fixed << setprecision(2) << ans << endl;
     }
 }
